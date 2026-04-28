@@ -1,4 +1,4 @@
-:- use_module(library(perfunctory_types)).
+:- use_module(library(qwerty)).
 
 :- discontiguous p/1, q/1.
 

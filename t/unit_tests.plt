@@ -1,4 +1,4 @@
-:- use_module(library(perfunctory_types/exports)).
+:- use_module(library(qwerty/exports)).
 
 setup :-
     % Some type declarations

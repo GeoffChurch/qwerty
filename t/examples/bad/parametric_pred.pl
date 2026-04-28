@@ -1,4 +1,4 @@
-:- use_module(library(perfunctory_types)).
+:- use_module(library(qwerty)).
 
 :- type _ ---> p(_). % p is parametric
 

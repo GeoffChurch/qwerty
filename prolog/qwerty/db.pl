@@ -46,8 +46,6 @@ retract_ctor(Name, Arity, Type) :-
        retractall(alias_canonical(_, Type))).
 
 retract_all_types_and_aliases :-
-    % forall(current_ctor(Name, Arity, Type),
-    %        retract_ctor(Name, Arity, Type)).
     retractall(ctor_pretype_type(_, _, _)),
     retractall(alias_canonical(_, _)).
 

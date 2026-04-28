@@ -1,6 +1,6 @@
-:- module(perfunctory_types, []).
+:- module(qwerty, []).
 
-:- reexport(library(perfunctory_types/exports)).
+:- reexport(library(qwerty/exports)).
 
 :- dynamic term_to_check/1.
 

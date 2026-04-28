@@ -1,7 +1,7 @@
 :- module(check, [typecheck/2, typecheck/3]).
 
-:- use_module(library(perfunctory_types/db), [get_types/1, get_aliases/1]).
-:- use_module(library(perfunctory_types/util), [cata/3, cyclesafe_type/4, dealias/3,
+:- use_module(library(qwerty/db), [get_types/1, get_aliases/1]).
+:- use_module(library(qwerty/util), [cata/3, cyclesafe_type/4, dealias/3,
 		     must_be_undeclared_type/3]).
 
 :- use_module(library(subsumes), [subsumes/2]).

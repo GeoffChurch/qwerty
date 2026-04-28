@@ -1,4 +1,4 @@
-:- use_module(library(perfunctory_types/declaration)).
+:- use_module(library(qwerty/declaration)).
 :- use_module(library(apply), [maplist/2]).
 
 :- multifile user:message_hook/3.

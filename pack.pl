@@ -1,7 +1,7 @@
-name(perfunctory_types).
+name(qwerty).
 version('0.3').
-title('Per-functor, static, polymorphic types').
+title('Quality, Well-Engineered, Reliable Types? Yes!').
 keywords([types]).
 author('Geoffrey Churchill', 'geoffrey.a.churchill@gmail.com').
-home('https://github.com/GeoffChurch/perfunctory_types').
+home('https://github.com/GeoffChurch/qwerty').
 requires(subsumes).

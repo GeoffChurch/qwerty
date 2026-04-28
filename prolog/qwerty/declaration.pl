@@ -2,14 +2,12 @@
 	      op(1150,  fx, type),
 	      op(1130, xfx, --->),
 	      (type)/1,
-	      current_ctor/3,
-	      retract_ctor/3,
 	      retract_all_types_and_aliases/0
 	  ]).
 
-:- use_module(library(perfunctory_types/check)).
-:- use_module(library(perfunctory_types/util)).
-:- use_module(library(perfunctory_types/db)).
+:- use_module(library(qwerty/check)).
+:- use_module(library(qwerty/util)).
+:- use_module(library(qwerty/db)).
 
 :- use_module(library(apply), [maplist/4, foldl/4, maplist/2]).
 :- use_module(library(assoc), [get_assoc/3, list_to_assoc/2]).

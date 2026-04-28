@@ -1,4 +1,4 @@
-:- use_module(library(perfunctory_types)).
+:- use_module(library(qwerty)).
 
 :- type color ---> r ; g ; b.
 :- type _ ---> X = X. % (=)/2 demands arguments of the same type.
