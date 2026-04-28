@@ -1,5 +1,5 @@
 name(qwerty).
-version('0.3').
+version('0.4').
 title('Quality, Well-Engineered, Reliable Types? Yes!').
 keywords([types]).
 author('Geoffrey Churchill', 'geoffrey.a.churchill@gmail.com').
