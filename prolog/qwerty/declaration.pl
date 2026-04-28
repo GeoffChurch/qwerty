@@ -81,12 +81,16 @@ vars_preserved(A, B) :-
 term_vars_ord --> term_variables, list_to_ord_set.
 
 allowed_functor(Term), nonvar(Term) =>
-    Term \= (_ :- _), % Reserved for rules so that we can assume rule types are skolemized to have the form _ :- _.
-    Term \= (_ ; _), % Reserved for sum types.
-    Term \= (_ -> _), % Reserved for function types.
-    Term \= cata_escape(_) % Reserved for cata escapes.
+    functor(Term, F, A),
+    (maplist(\=(F),
+	     [
+		(:-), % Reserved for rules so that we can assume rule types are skolemized to have the form _ :- _.
+		(;), % Reserved for sum types.
+		(->), % Reserved for function types.
+		cata_escape % Reserved for cata escapes.
+	    ])
     -> true
-    ;  throw(error(ill_typed(illegal_functor(Term)), _)).
+    ;  throw(error(ill_typed(illegal_functor(F/A)), _))).
 
 must_be_undeclared_ctor(Types, PreType), nonvar(PreType) =>
     $(functor(PreType, Ctor, _)),

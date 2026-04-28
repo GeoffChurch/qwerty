@@ -90,11 +90,26 @@ test(ctor_as_type, [error(ill_typed(already_declared_ctor(z)), _)]) :-
 test(reusing_ctor, [error(ill_typed(already_declared_ctor(z)), _)]) :-
     type blablabla ---> z.
 
-test(disallowed_ctor_functor, [error(ill_typed(illegal_functor(_->_)), _)]) :-
+test(disallowed_ctor_functor, [error(ill_typed(illegal_functor((->)/2)), _)]) :-
     type arrow(A, B) ---> (A -> B).
 
-test(disallowed_type_functor, [error(ill_typed(illegal_functor(_->_)), _)]) :-
+test(disallowed_ctor_cata_escape, [error(ill_typed(illegal_functor(cata_escape/1)), _)]) :-
+    type t_ce1 ---> cata_escape(a).
+
+test(disallowed_ctor_cata_escape2, [error(ill_typed(illegal_functor(cata_escape/2)), _)]) :-
+    type t_ce2 ---> cata_escape(a, b).
+
+test(disallowed_type_functor, [error(ill_typed(illegal_functor((->)/2)), _)]) :-
     type (A -> B) ---> arrow(A, B).
+
+test(disallowed_type_cata_escape, [error(ill_typed(illegal_functor(cata_escape/1)), _)]) :-
+    type cata_escape(X) ---> blablabla(X).
+
+test(disallowed_type_cata_escape2, [error(ill_typed(illegal_functor(cata_escape/2)), _)]) :-
+    type cata_escape(X, _) ---> blablabla(X).
+
+test(disallowed_type_semicolon, [error(ill_typed(illegal_functor((;)/2)), _)]) :-
+    type (X;Y) ---> blablabla(X, Y).
 
 test(unification_success, [Type == refl(nat)]) :-
     typecheck(z = s(z), Type).
@@ -132,6 +147,10 @@ test(call_success, [Type == call(nat, nat)]) :-
 test(call_failure, [E =@= ill_typed(expected_type(list(_)),got(nat))]) :-
     catch_error(typecheck(call(s, []), _), E).
 
+test(call3, [Type == call3(nat, nat, pair(nat, nat))]) :-
+    (type _ ---> call3((A -> B -> _), A, B)),
+    typecheck(call3(pair, z, s(z)), Type).
+
 test(alias_when_requested, [ListNat == list(nat)]) :-
     typecheck(pair([z], _), stream(ListNat)).
 
@@ -156,6 +175,16 @@ test(failed_alias, [E =@= ill_typed(expected_type(nat),got(Stream))]) :-
 
 test(argument_of_alias_inferred, [Nat == nat]) :-
     typecheck(pair(z, _), stream(Nat)).
+
+test(transitive_alias) :-
+    (type nat2 == nat),
+    (type nat3 == nat2),
+    typecheck(s(z), nat3).
+
+test(phantom_alias) :-
+    (type phantom(_) == nat),
+    typecheck(z, phantom(casper)),
+    typecheck(z, phantom(slimer)).
 
 test(pure_recursive_type, [Type == prec]) :-
     (type prec ---> prec(prec)),
