@@ -25,8 +25,8 @@ typecheck(Infers, Term, Type) :-
 typecheck(Types, Aliases, Infers, Term, Type) :-
     $(dealias(Aliases, Type, CanonicalType)),
     catch(cata(typecheck_(Types, Aliases, Infers), Term, CanonicalType),
-	  error(determinism_error(PT=T,det,fail,goal), Ctx),
-	  throw(error(ill_typed(expected_type(T), got_type(PT)),
+	  error(determinism_error(Expected=Actual,det,fail,goal), Ctx),
+	  throw(error(ill_typed(expected_type(Expected), got_type(Actual)),
 		      Ctx))).
 
 typecheck_(Types, Aliases, Infers, PreType, Type) =>
@@ -68,7 +68,7 @@ matchargs(PartTerm, PartType, FullTerm, FullType) :-
     % before ending at FullType.
     (arrow_list(PartType, RestArgs, FullType)
     *-> true
-    ;   throw(error(ill_typed(expected_type(FullType), got(PartType)),
+    ;   throw(error(ill_typed(expected_type(PartType), got(FullType)),
 		    _))).
 
 arrow_list(FullType, [], FullType).

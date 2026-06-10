@@ -37,13 +37,13 @@ test(incomplete_list, [Type =@= list(list(_))]) :-
 test(complete_list, [Type == list(list(nat))]) :-
     typecheck([[],[s(s(z))]], Type).
 
-test(heterogeneous_list, [E =@= ill_typed(expected_type(list(_)),got(nat))]) :-
+test(heterogeneous_list, [E =@= ill_typed(expected_type(nat),got(list(_)))]) :-
     catch_error(typecheck([[z],[[]]], _), E).
 
 test(whole_program, [Type == (nat, (nat     :- nat ), even,      (even          :- even))]) :-
     typecheck(               (z,   (s(s(N)) :- s(N)), even(z),   (even(s(s(N))) :- even(N))), Type).
 
-test(typecheck_fail_propagates, [E =@= ill_typed(expected_type(list(_)),got(nat))]) :-
+test(typecheck_fail_propagates, [E =@= ill_typed(expected_type(nat),got(list(_)))]) :-
     catch_error(typecheck([even([])], _), E).
 
 test(var_preservation, [error(ill_typed(vars_not_preserved(f(_), potato)), _)]) :-
@@ -114,7 +114,7 @@ test(disallowed_type_semicolon, [error(ill_typed(illegal_functor((;)/2)), _)]) :
 test(unification_success, [Type == refl(nat)]) :-
     typecheck(z = s(z), Type).
 
-test(unification_failure, [E =@= ill_typed(expected_type(list(_)),got(nat))]) :-
+test(unification_failure, [E =@= ill_typed(expected_type(nat),got(list(_)))]) :-
     catch_error(typecheck(z = [], _), E).
 
 test(unification_skolem_success, [Type == refl(f)]) :-
@@ -123,16 +123,16 @@ test(unification_skolem_success, [Type == refl(f)]) :-
 test(annotated_skolem_success, [X-Y-Type =@= cata_escape(T)-cata_escape(T)-list(f(T))]) :-
     typecheck([f(X), f(Y)], Type).
 
-test(unification_skolem_over_different_types, [E =@= ill_typed(expected_type(list(_)),got(nat))]) :-
+test(unification_skolem_over_different_types, [E =@= ill_typed(expected_type(nat),got(list(_)))]) :-
     catch_error(typecheck(f(z) = f([]), _), E).
 
 test(unification_different_skolems, [E =@= ill_typed(expected_type(apple),got_untyped_term(orange))]) :-
     catch_error(typecheck(apple = orange, _), E).
 
-test(unification_existing_with_skolem, [E =@= ill_typed(expected_type(list(_)),got(apple))]) :-
+test(unification_existing_with_skolem, [E =@= ill_typed(expected_type(apple),got(list(_)))]) :-
     catch_error(typecheck(f(apple) = f([]), _), E).
 
-test(annotated_skolem_failure, [E =@= ill_typed(expected_type(list(_)),got(nat))]) :-
+test(annotated_skolem_failure, [E =@= ill_typed(expected_type(nat),got(list(_)))]) :-
     catch_error(typecheck([f(z), f([])], _), E).
 
 test(ho_multi, [Type =@= (X->list(X)->list(X))]) :-
@@ -144,7 +144,7 @@ test(ho_curry, [Type =@= (list(list(X))->list(list(X)))]) :-
 test(call_success, [Type == call(nat, nat)]) :-
     typecheck(call(s, s(z)), Type).
 
-test(call_failure, [E =@= ill_typed(expected_type(list(_)),got(nat))]) :-
+test(call_failure, [E =@= ill_typed(expected_type(nat),got(list(_)))]) :-
     catch_error(typecheck(call(s, []), _), E).
 
 test(call3, [Type == call3(nat, nat, pair(nat, nat))]) :-
@@ -157,7 +157,7 @@ test(alias_when_requested, [ListNat == list(nat)]) :-
 test(no_alias_when_not_requested, [Type =@= pair(list(nat), _)]) :-
     typecheck(pair([z], _), Type).
 
-test(failure_propagates_through_alias, [E =@= ill_typed(expected_type(list(_)),got(nat))]) :-
+test(failure_propagates_through_alias, [E =@= ill_typed(expected_type(nat),got(list(_)))]) :-
     catch_error(typecheck(pair([[]], _), stream(list(nat))), E).
 
 test(nested_alias) :-
@@ -169,7 +169,7 @@ test(nested_alias_collapse) :-
 test(function_alias, [Nat == nat]) :-
     typecheck('[|]'(z), cons_alias(Nat)).
 
-test(failed_alias, [E =@= ill_typed(expected_type(nat),got(Stream))]) :-
+test(failed_alias, [E =@= ill_typed(expected_type(Stream),got(nat))]) :-
     Stream = pair(_, Stream),
     catch_error(typecheck(pair(_, z), stream(_)), E).
 
@@ -243,11 +243,11 @@ test(rectype_curry_var_both, [Type =@= (stream(X) -> stream(X))]) :-
     Type = (stream(_) -> stream(_)),
     typecheck(pair(_), Type).
 
-test(internal_skolemize_to_recursive_type1, [E == ill_typed(expected_type(G),got_type(nat))]) :-
+test(internal_skolemize_to_recursive_type1, [E == ill_typed(expected_type(nat),got_type(G))]) :-
     G = g(G),
     catch_error(typecheck((X = g(X), f(z) = f(X)), _), E).
 
-test(internal_skolemize_to_recursive_type2, [E == ill_typed(expected_type(nat),got(G))]) :-
+test(internal_skolemize_to_recursive_type2, [E == ill_typed(expected_type(G),got(nat))]) :-
     G = g(G),
     catch_error(typecheck((X = g(X), f(X) = f(z)), _), E).
 
