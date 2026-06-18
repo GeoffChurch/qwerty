@@ -155,8 +155,9 @@ Some options are:
 
 ## Testing
 
+Run from the project root:
 ```shell
-for file in t/*.plt; do swipl -g "consult('$file'), run_tests" -t halt; done
+swipl -p library=prolog -g "expand_file_name('t/*.plt', Files), load_files(Files), run_tests" -t halt
 ```
 
 ---
@@ -167,6 +168,9 @@ for file in t/*.plt; do swipl -g "consult('$file'), run_tests" -t halt; done
 2. do GitHub release with new tag matching the pack.pl version
 3. execute:
 
-```prolog
-?- make_directory(potato), pack_install(qwerty, [url('http://github.com/GeoffChurch/qwerty/archive/13.17.zip'), package_directory(potato)]).
+```shell
+version=$(awk -F"'" '/^version/ {print $2}' pack.pl)
+tmp=$(mktemp -d)
+swipl -g "pack_install(qwerty, [url('https://github.com/GeoffChurch/qwerty/archive/${version}.zip'), pack_directory('$tmp'), interactive(false)]), halt"
+rm -rf "$tmp"
 ```

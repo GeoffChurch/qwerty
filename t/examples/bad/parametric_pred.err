@@ -1,0 +1,1 @@
+ill_typed(expected_type(a),got_untyped_term(b)).

@@ -1,0 +1,1 @@
+ill_typed(expected_type(bool),got_untyped_term(flase)).

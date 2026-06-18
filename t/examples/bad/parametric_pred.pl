@@ -2,5 +2,6 @@
 
 :- type _ ---> p(_). % p is parametric
 
-p(a). % ok, this clause's head has type p(a)
-p(b). % FAIL, p(b) is syntactically well-formed but the predicate fails the semantic check
+p(_). % ok, head has type p(X) for existential X
+p(a). % ok, head has type p(a), X is bound to a
+p(b). % FAIL, p(a) and p(b) don't unify (semantic failure via head unification)
