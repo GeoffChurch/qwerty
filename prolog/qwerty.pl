@@ -1,4 +1,4 @@
-:- module(qwerty, []).
+:- module(qwerty, [qwerty_wanted/0]).
 
 :- reexport(library(qwerty/exports)).
 
@@ -34,14 +34,19 @@ check_and_infer(Infers, Term, Type) :-
     ;  throw(error(ill_typed(failed_unification(HeadType_ = HeadType)), _))
     ).
 
-user:term_expansion(end_of_file, []) :-
-    % Collect stored terms
-    findall(Term, retract(term_to_check(Term)), Terms),
+qwerty_wanted :-
+    prolog_load_context(module, M),
+    predicate_property(M:qwerty_wanted, imported_from(qwerty)).
+
+user:term_expansion -->
+    { qwerty_wanted },
+    term_expansion_.
+
+term_expansion_(end_of_file, []) :-
+    findall(T, retract(term_to_check(T)), Terms),
     init_infers(Terms, Infers),
-    writeln('Terms:'),
-    maplist(writeln, Terms),
     maplist(check_and_infer(Infers), Terms, _).
 
-user:term_expansion(Term, [Term]) :-
+term_expansion_(Term, [Term]) :-
     \+ unwanted_term(Term),
-    assertz(term_to_check(Term)). % Store term
+    assertz(term_to_check(Term)).
