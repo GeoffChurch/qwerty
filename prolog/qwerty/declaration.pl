@@ -1,10 +1,9 @@
 :- module(declaration, [
-	      op(1150,  fx, type),
-	      op(1130, xfx, --->),
 	      (type)/1,
 	      retract_all_types_and_aliases/0
 	  ]).
 
+:- use_module(library(qwerty/ops)).
 :- use_module(library(qwerty/check)).
 :- use_module(library(qwerty/util)).
 :- use_module(library(qwerty/db)).
@@ -86,7 +85,7 @@ allowed_functor(Term), nonvar(Term) =>
 	     [
 		(:-), % Reserved for rules so that we can assume rule types are skolemized to have the form _ :- _.
 		(;), % Reserved for sum types.
-		(->), % Reserved for function types.
+		(~>), % Reserved for function types.
 		cata_escape % Reserved for cata escapes.
 	    ])
     -> true

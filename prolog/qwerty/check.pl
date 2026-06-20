@@ -5,6 +5,7 @@
 		     must_be_undeclared_type/3]).
 
 :- use_module(library(subsumes), [subsumes/2]).
+:- use_module(library(qwerty/ops)).
 
 :- det(typecheck/5).
 
@@ -72,5 +73,5 @@ matchargs(PartTerm, PartType, FullTerm, FullType) :-
 		    _))).
 
 arrow_list(FullType, [], FullType).
-arrow_list(X->Arrows, [X|List], RestArrows) :-
+arrow_list(X~>Arrows, [X|List], RestArrows) :-
     arrow_list(Arrows, List, RestArrows).

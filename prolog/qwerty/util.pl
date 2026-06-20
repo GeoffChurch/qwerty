@@ -6,6 +6,7 @@
 			       rb_lookup/3]).
 :- autoload(library(terms), [same_functor/2, mapargs/3]).
 :- autoload(library(assoc), [gen_assoc/3]).
+:- use_module(library(qwerty/ops)).
 
 :- meta_predicate cata(2, ?, ?).
 cata(F) --> { rb_empty(Seen) }, cata_(F, Seen).
@@ -54,7 +55,7 @@ must_be_undeclared_type(Types, Als, Type) :-
     -> throw(error(ill_typed(already_declared_type(Type)), _))
     ;  true.
 
-declared_type(_, _, (_ -> _)) => true.
+declared_type(_, _, (_ ~> _)) => true.
 declared_type(Types, Als, Type), nonvar(Type) =>
     % This allows arity-overloaded types. TODO maybe should be
     % disallowed as is done for ctors.

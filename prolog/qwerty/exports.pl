@@ -1,8 +1,8 @@
 :- module(exports, []).
 
+:- reexport(library(qwerty/ops)).
+
 :- reexport(library(qwerty/declaration), [
-    op(1150,  fx, type),
-    op(1130, xfx, --->),
     (type)/1,
     retract_all_types_and_aliases/0]).
 

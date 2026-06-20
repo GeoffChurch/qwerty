@@ -75,7 +75,7 @@ Type = list(list(_)).
 
 ```prolog
 ?- typecheck('[|]', Type).
-Type = (_A->list(_A)->list(_A)).
+Type = (_A~>list(_A)~>list(_A)).
 ```
 
 ### Equirecursive fixpoints

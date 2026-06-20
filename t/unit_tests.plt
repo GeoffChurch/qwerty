@@ -7,15 +7,15 @@ setup :-
     $(type nat     ---> z ; s(nat)),
     $(type _       ---> even(nat)),
     $(type list(X) ---> [] ; [X|list(X)]),
-    $(type _       ---> pair(_, _)), % This is an "arity constraint" so that pair(z) has type X -> pair(nat, X).
-    $(type _       ---> call((A -> _), A)), % ctors can't be arity-overloaded, so we'd need e.g. call0, call1, etc.
+    $(type _       ---> pair(_, _)), % This is an "arity constraint" so that pair(z) has type X ~> pair(nat, X).
+    $(type _       ---> call((A ~> _), A)), % ctors can't be arity-overloaded, so we'd need e.g. call0, call1, etc.
 
     % Some type aliases
     $(StreamT = pair(X, StreamT)),
     $(type stream(X)       == StreamT), % Equirecursion via cyclic terms and type aliasing.
     $(type streamstream(X) == stream(stream(X))),
-    $(type succ_alias      == (nat -> nat)),
-    $(type cons_alias(X)   == (list(X) -> list(X))).
+    $(type succ_alias      == (nat ~> nat)),
+    $(type cons_alias(X)   == (list(X) ~> list(X))).
 
 catch_error(Goal, E) :-
     catch(Goal, error(E, _), true).
@@ -90,8 +90,8 @@ test(ctor_as_type, [error(ill_typed(already_declared_ctor(z)), _)]) :-
 test(reusing_ctor, [error(ill_typed(already_declared_ctor(z)), _)]) :-
     type blablabla ---> z.
 
-test(disallowed_ctor_functor, [error(ill_typed(illegal_functor((->)/2)), _)]) :-
-    type arrow(A, B) ---> (A -> B).
+test(disallowed_ctor_functor, [error(ill_typed(illegal_functor((~>)/2)), _)]) :-
+    type arrow(A, B) ---> (A ~> B).
 
 test(disallowed_ctor_cata_escape, [error(ill_typed(illegal_functor(cata_escape/1)), _)]) :-
     type t_ce1 ---> cata_escape(a).
@@ -99,8 +99,8 @@ test(disallowed_ctor_cata_escape, [error(ill_typed(illegal_functor(cata_escape/1
 test(disallowed_ctor_cata_escape2, [error(ill_typed(illegal_functor(cata_escape/2)), _)]) :-
     type t_ce2 ---> cata_escape(a, b).
 
-test(disallowed_type_functor, [error(ill_typed(illegal_functor((->)/2)), _)]) :-
-    type (A -> B) ---> arrow(A, B).
+test(disallowed_type_functor, [error(ill_typed(illegal_functor((~>)/2)), _)]) :-
+    type (A ~> B) ---> arrow(A, B).
 
 test(disallowed_type_cata_escape, [error(ill_typed(illegal_functor(cata_escape/1)), _)]) :-
     type cata_escape(X) ---> blablabla(X).
@@ -135,10 +135,10 @@ test(unification_existing_with_skolem, [E =@= ill_typed(expected_type(apple),got
 test(annotated_skolem_failure, [E =@= ill_typed(expected_type(nat),got(list(_)))]) :-
     catch_error(typecheck([f(z), f([])], _), E).
 
-test(ho_multi, [Type =@= (X->list(X)->list(X))]) :-
+test(ho_multi, [Type =@= (X~>list(X)~>list(X))]) :-
     typecheck('[|]', Type).
 
-test(ho_curry, [Type =@= (list(list(X))->list(list(X)))]) :-
+test(ho_curry, [Type =@= (list(list(X))~>list(list(X)))]) :-
     typecheck('[|]'([]), Type).
 
 test(call_success, [Type == call(nat, nat)]) :-
@@ -148,7 +148,7 @@ test(call_failure, [E =@= ill_typed(expected_type(nat),got(list(_)))]) :-
     catch_error(typecheck(call(s, []), _), E).
 
 test(call3, [Type == call3(nat, nat, pair(nat, nat))]) :-
-    (type _ ---> call3((A -> B -> _), A, B)),
+    (type _ ---> call3((A ~> B ~> _), A, B)),
     typecheck(call3(pair, z, s(z)), Type).
 
 test(alias_when_requested, [ListNat == list(nat)]) :-
@@ -208,39 +208,39 @@ test(union_alias, [error(ill_typed(already_declared_type(alias)), _)]) :-
     (type alias == nat),
     (type alias == list(nat)).
 
-test(rectype_curry_nat_neither, [Type =@= (X -> pair(nat, X))]) :-
+test(rectype_curry_nat_neither, [Type =@= (X ~> pair(nat, X))]) :-
     typecheck(pair(z), Type).
 
-test(rectype_curry_var_neither, [Type =@= (X -> pair(_, X))]) :-
+test(rectype_curry_var_neither, [Type =@= (X ~> pair(_, X))]) :-
     typecheck(pair(_), Type).
 
-test(rectype_curry_nat_lhs, [Type == (stream(X) -> pair(nat, Stream))]) :-
-    Type = (stream(X) -> _),
+test(rectype_curry_nat_lhs, [Type == (stream(X) ~> pair(nat, Stream))]) :-
+    Type = (stream(X) ~> _),
     typecheck(pair(z), Type),
     Stream = pair(X, Stream).
 
-test(rectype_curry_var_lhs, [Type =@= (stream(X) -> pair(_, Stream))]) :-
-    Type = (stream(X) -> _),
+test(rectype_curry_var_lhs, [Type =@= (stream(X) ~> pair(_, Stream))]) :-
+    Type = (stream(X) ~> _),
     typecheck(pair(_), Type),
     Stream = pair(X, Stream).
 
 test(rectype_curry_nat_rhs) :-
-    Type = (StreamNat -> stream(Nat)),
+    Type = (StreamNat ~> stream(Nat)),
     typecheck(pair(z), Type),
     Nat == nat,
     StreamNat == pair(nat, StreamNat).
 
 test(rectype_curry_var_rhs) :-
-    Type = (StreamT -> stream(X)),
+    Type = (StreamT ~> stream(X)),
     typecheck(pair(_), Type),
     StreamT == pair(X, StreamT).
 
-test(rectype_curry_nat_both, [Type == (stream(nat) -> stream(nat))]) :-
-    Type = (stream(_) -> stream(_)),
+test(rectype_curry_nat_both, [Type == (stream(nat) ~> stream(nat))]) :-
+    Type = (stream(_) ~> stream(_)),
     typecheck(pair(z), Type).
 
-test(rectype_curry_var_both, [Type =@= (stream(X) -> stream(X))]) :-
-    Type = (stream(_) -> stream(_)),
+test(rectype_curry_var_both, [Type =@= (stream(X) ~> stream(X))]) :-
+    Type = (stream(_) ~> stream(_)),
     typecheck(pair(_), Type).
 
 test(internal_skolemize_to_recursive_type1, [E == ill_typed(expected_type(nat),got_type(G))]) :-
@@ -282,23 +282,23 @@ specialized_cata_setup :-
     (type nat == NatT),
     (type arity ---> even ; odd),
     (type _ ---> nat_arity(natF(arity), arity)),
-    (type _ ---> fmapNat((A -> B -> _), natF(A), natF(B))),
-    (type _ ---> cataNat((natF(A) -> A -> _), nat, A)).
+    (type _ ---> fmapNat((A ~> B ~> _), natF(A), natF(B))),
+    (type _ ---> cataNat((natF(A) ~> A ~> _), nat, A)).
 
 test(nat_arity, [Type == (nat_arity, nat_arity, nat_arity)]) :-
     typecheck((nat_arity(z, even),
 	       nat_arity(s(even), odd),
 	       nat_arity(s(odd), even)), Type).
 
-test(fmapNat, [Type =@= (fmapNat(_,_,_),fmapNat(Q,R,S):-call((Q->R->S),Q,R))]) :-
+test(fmapNat, [Type =@= (fmapNat(_,_,_),fmapNat(Q,R,S):-call((Q~>R~>S),Q,R))]) :-
     typecheck((fmapNat(_, z, z),
 	       fmapNat(F, s(X), s(Y)) :- call(F, X, Y)), Type).
 
-test(cataNat_unaliased, [Type =@= (cataNat(CoD,AlgT):-fmapNat(Nat,CoD,cataNat(CoD,AlgT)),call((natF(CoD)->CoD->AlgT),natF(CoD),CoD))]) :-
+test(cataNat_unaliased, [Type =@= (cataNat(CoD,AlgT):-fmapNat(Nat,CoD,cataNat(CoD,AlgT)),call((natF(CoD)~>CoD~>AlgT),natF(CoD),CoD))]) :-
     Nat = natF(Nat),
     typecheck((cataNat(Alg, A, B) :- fmapNat(cataNat(Alg), A, B0), call(Alg, B0, B)), Type).
 
-test(cataNat_aliased, [Type =@= (cataNat(CoD,AlgT):-fmapNat(nat,CoD,cataNat(CoD,AlgT)),call((natF(CoD)->CoD->AlgT),natF(CoD),CoD))]) :-
+test(cataNat_aliased, [Type =@= (cataNat(CoD,AlgT):-fmapNat(nat,CoD,cataNat(CoD,AlgT)),call((natF(CoD)~>CoD~>AlgT),natF(CoD),CoD))]) :-
     Type = (_:-fmapNat(nat,_,_),_), % Force natF(natF(...)) to be aliased to nat.
     typecheck((cataNat(Alg, A, B) :- fmapNat(cataNat(Alg), A, B0), call(Alg, B0, B)), Type).
 

@@ -12,6 +12,7 @@
           ]).
 
 :- use_module(library(qwerty/declaration)).
+:- use_module(library(qwerty/ops)).
 :- use_module(library(readutil)).
 
 :- meta_predicate with_examples(+, 0).
