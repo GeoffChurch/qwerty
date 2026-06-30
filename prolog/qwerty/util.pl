@@ -1,5 +1,5 @@
-:- module(util, [cata/3, catapred/2, cyclesafe_alias_canonical/3,
-		 cyclesafe_type/4, dealias/3, must_be_declared_type/3,
+:- module(util, [cata/3, catapred/2, declared_alias/3,
+		 declared_type/4, dealias/3, must_be_declared_type/3,
 		 must_be_undeclared_type/3]).
 
 :- autoload(library(rbtrees), [rb_empty/1, rb_insert_new/4,
@@ -35,30 +35,30 @@ dealias(Als, A, C) :-
     cata(dealias_(Als), A_, C),
     cata(=, A_, A). % Unescape everything.
 
-dealias_(Als) --> cyclesafe_alias_canonical(Als) *-> {} ; {}.
+dealias_(Als) --> declared_alias(Als) *-> {} ; {}.
 
-cyclesafe_alias_canonical(Als, A, C), var(C), nonvar(A) =>
+declared_alias(Als, A, C), var(C), nonvar(A) =>
     copy_term(Als, Als_),
     bagof(C_, gen_assoc(A, Als_, C_), [C]).
 
-cyclesafe_type(Types, Ctor, PreType, Type), var(PreType) =>
+declared_type(Types, Ctor, PreType, Type), var(PreType) =>
     copy_term(Types, Types_),
     gen_assoc(Ctor, Types_, pretype_type(PreType, Type)).
 
 must_be_declared_type(Types, Als, Type) :-
-    declared_type(Types, Als, Type)
+    is_declared_type(Types, Als, Type)
     -> true
     ;  throw(error(ill_typed(undeclared_type(Type)), _)).
 
 must_be_undeclared_type(Types, Als, Type) :-
-    declared_type(Types, Als, Type)
+    is_declared_type(Types, Als, Type)
     -> throw(error(ill_typed(already_declared_type(Type)), _))
     ;  true.
 
-declared_type(_, _, (_ ~> _)) => true.
-declared_type(Types, Als, Type), nonvar(Type) =>
+is_declared_type(_, _, (_ ~> _)) => true.
+is_declared_type(Types, Als, Type), nonvar(Type) =>
     % This allows arity-overloaded types. TODO maybe should be
     % disallowed as is done for ctors.
     $(same_functor(Type, Skel)),
-    (cyclesafe_type(Types, _, _, Skel)
-    ; cyclesafe_alias_canonical(Als, Skel, _)).
+    (declared_type(Types, _, _, Skel)
+    ; declared_alias(Als, Skel, _)).
